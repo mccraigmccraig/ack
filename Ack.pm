@@ -218,6 +218,7 @@ sub get_command_line_options {
         o                       => sub { $opt{output} = '$&' },
         'output=s'              => \$opt{output},
         'pager=s'               => \$opt{pager},
+        'nofilter'              => \$opt{nofilter},
         'nopager'               => sub { $opt{pager} = undef },
         'passthru'              => \$opt{passthru},
         'print0'                => \$opt{print0},
@@ -779,6 +780,7 @@ File inclusion/exclusion:
 
 Miscellaneous:
   --noenv               Ignore environment variables and ~/.ackrc
+  --nofilter            Do not run in filter mode, despite STDIN being a pipe
   --help                This help
   --man                 Man page
   --version             Display version & copyright
@@ -1487,7 +1489,9 @@ Returns true if ack's input is coming from a pipe.
 =cut
 
 sub input_from_pipe {
-    return $input_from_pipe;
+    my $opt = shift;
+
+    return $input_from_pipe && !$opt->{nofilter};
 }
 
 

@@ -58,7 +58,7 @@ sub main {
 
     $| = 1 if $opt->{flush}; # Unbuffer the output if flush mode
 
-    if ( App::Ack::input_from_pipe() ) {
+    if ( App::Ack::input_from_pipe( $opt ) ) {
         # We're going into filter mode
         for ( qw( f g l ) ) {
             $opt->{$_} and App::Ack::die( "Can't use -$_ when acting as a filter." );
@@ -1230,6 +1230,7 @@ sub get_command_line_options {
         o                       => sub { $opt{output} = '$&' },
         'output=s'              => \$opt{output},
         'pager=s'               => \$opt{pager},
+        'nofilter'              => \$opt{nofilter},
         'nopager'               => sub { $opt{pager} = undef },
         'passthru'              => \$opt{passthru},
         'print0'                => \$opt{print0},
@@ -1708,6 +1709,7 @@ File inclusion/exclusion:
 
 Miscellaneous:
   --noenv               Ignore environment variables and ~/.ackrc
+  --nofilter            Do not run in filter mode, despite STDIN being a pipe
   --help                This help
   --man                 Man page
   --version             Display version & copyright
@@ -2319,7 +2321,9 @@ sub set_up_pager {
 
 
 sub input_from_pipe {
-    return $input_from_pipe;
+    my $opt = shift;
+
+    return $input_from_pipe && !$opt->{nofilter};
 }
 
 
